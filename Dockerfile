@@ -1,10 +1,26 @@
-FROM maven:3.8.3-amazoncorretto-11
+# MavenとJDKをベースとするDockerイメージを選択
+FROM maven:3.8.3-openjdk-11 AS build
 
+# コンテナ内の作業ディレクトリを指定
 WORKDIR /usr/src/app
 
-COPY . /usr/src/app
-RUN mvn package
+# Mavenの依存関係をキャッシュする
+COPY pom.xml .
+RUN mvn dependency:go-offline
 
-ENV PORT 5000
-EXPOSE $PORT
-CMD [ "sh", "-c", "mvn -Dserver.port=${PORT} spring-boot:run" ]
+# アプリケーションのソースコードをコピー
+COPY src ./src
+
+# アプリケーションをビルド
+RUN mvn package -DskipTests
+
+# 本番用の軽量なJREをベースとするDockerイメージを選択
+FROM adoptopenjdk/openjdk11:alpine-jre AS runtime
+# ビルドステージからビルド済みのJARファイルをコピー
+COPY --from=build /usr/src/app/target/demo-0.0.1-SNAPSHOT.jar /app/demo.jar
+
+# ポートのエクスポート
+EXPOSE 8080
+
+# アプリケーションを実行
+CMD ["java", "-jar", "/app/demo.jar"]
