@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>I NEED List</title>
+<link th:href="@{/css/style.css}" rel="stylesheet" type="text/css">
+</head>
+<body>
+	<!-- <div th:replace="fragments :: msg_area"></div> -->
+	<h3 th:text="#{text.login}"></h3>
+	<form th:action="@{/login/do}" method="post" th:object="${loginData}">
+		<table>
+			<!-- ユーザーID -->
+			<tr>
+				<th th:text="#{label.loginId}"></th>
+
+				<td><input type="text" name="loginId">
+					<div th:if="${#fields.hasErrors('loginId')}" th:errors="*{loginId}"
+						th:errorclass="red"></div></td>
+			</tr>
+			<!-- パスワード -->
+			<tr>
+				<th th:text="#{label.password}"></th>
+				<td><input type="password" name="password">
+					<div th:if="${#fields.hasErrors('password')}"
+						th:errors="*{password}" th:errorclass="red"></div></td>
+			</tr>
+		</table>
+		<!-- ログインボタン -->
+		<button type="submit" th:text="#{button.login}"></button>
+		<!-- 新規登録リンク -->
+		<a th:href="@{/regist}" th:text="#{text.register}"></a>
+	</form>
+</body>
+</html>
